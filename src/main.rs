@@ -12,10 +12,15 @@ fn main() {
 
         let command = command.trim();
 
-        if command == "exit" {
-            break;
+        if let Some(cmd) = command.split(" ").nth(0) {
+            match cmd {
+                "exit" => break,
+                "echo" => {
+                    let words: Vec<&str> = command.split(" ").skip(1).collect();
+                    println!("{}", words.join(" "))
+                }
+                _ => println!("{}: command not found", command),
+            }
         }
-
-        println!("{}: command not found", command);
     }
 }
