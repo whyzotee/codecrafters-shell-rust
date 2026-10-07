@@ -8,14 +8,5 @@ fn main() {
 
     let mut command = String::new();
     io::stdin().read_line(&mut command).unwrap();
-
-    let command = command.trim();
-
-    match command {
-        "echo" => print!("{command}"),
-        "cd" => print!(""),
-        _ => print!("{command}: command not found"),
-    }
-
-    io::stdout().flush().unwrap();
+    print!("{}: command not found", command.trim());
 }
