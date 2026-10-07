@@ -27,7 +27,7 @@ fn main() {
                     if args.len() == 1 && all_cmd.contains(&args[0]) {
                         println!("{} is a shell builtin", &args[0]);
                     } else {
-                        println!("{}: not found", command);
+                        println!("{}: not found", &args[0]);
                     }
                 }
                 _ => println!("{}: command not found", command),
