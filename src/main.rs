@@ -2,10 +2,26 @@ use std::env;
 #[allow(unused_imports)]
 use std::io::{self, Write};
 
+fn find_command_in_path(cmd: &str, path: &str) -> Option<String> {
+    let all_path: Vec<&str> = path.split("/").collect();
+
+    for p in all_path {
+        if let Some(paths) = env::var_os(p) {
+            for path in env::split_paths(&paths) {
+                if path.display().to_string().contains(cmd) {
+                    return Some(path.display().to_string());
+                }
+            }
+        }
+    }
+
+    None
+}
+
 fn main() {
     let key = "PATH";
 
-    'outer: loop {
+    loop {
         print!("$ ");
         io::stdout().flush().unwrap();
 
@@ -29,19 +45,11 @@ fn main() {
                     if args.len() == 1 && all_cmd.contains(&args[0]) {
                         println!("{} is a shell builtin", &args[0]);
                     } else {
-                        match env::var_os(key) {
-                            Some(paths) => {
-                                for path in env::split_paths(&paths) {
-                                    if path.display().to_string().contains(&args[0]) {
-                                        println!("{} is {}", &args[0], path.display());
-                                        continue 'outer;
-                                    }
-                                }
-                            }
-                            None => println!("{key} is not defined in the environment."),
+                        if let Some(path) = find_command_in_path(&args[0], key) {
+                            println!("{} is {}", &args[0], path)
+                        } else {
+                            println!("{}: not found", &args[0]);
                         }
-
-                        println!("{}: not found", &args[0]);
                     }
                 }
                 _ => println!("{}: command not found", command),
