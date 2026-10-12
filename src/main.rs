@@ -1,6 +1,8 @@
 use std::io::{self, Write};
-use std::os::unix::fs::PermissionsExt;
 use std::{env, fs};
+
+#[cfg(unix)]
+use std::os::unix::fs::PermissionsExt;
 
 #[cfg(unix)]
 fn check_permission_can_execute(f: &str) -> bool {
@@ -10,6 +12,11 @@ fn check_permission_can_execute(f: &str) -> bool {
     let user_execute = mode & 0o100 != 0;
 
     user_execute
+}
+
+#[cfg(windows)]
+fn check_permission_can_execute(_f: &str) -> bool {
+    true
 }
 
 fn find_command_in_path(cmd: &str, path: &str) -> Option<String> {
