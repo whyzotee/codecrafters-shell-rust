@@ -19,16 +19,10 @@ fn find_command_in_path(cmd: &str, path: &str) -> Option<String> {
 
                 let f = f.unwrap().path().display().to_string();
 
-                if f.contains(cmd) {
+                if f.split("/").last().unwrap() == cmd {
                     return Some(f);
                 }
             }
-
-            // println!("path: {:?}", path.display());
-
-            // if path.display().to_string().contains(cmd) {
-            //     return Some(path.display().to_string());
-            // }
         }
     }
 
