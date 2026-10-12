@@ -18,6 +18,33 @@ fn find_command_in_path(cmd: &str, path: &str) -> Option<String> {
     None
 }
 
+fn handle_command(cmd: &str, args: Vec<&str>, path_key: &str) -> i32 {
+    let all_cmd = vec!["exit", "echo", "type"];
+
+    match cmd {
+        "exit" => -1,
+        "echo" => {
+            println!("{}", args.join(" "));
+
+            0
+        }
+        "type" => {
+            if args.len() == 1 && all_cmd.contains(&args[0]) {
+                println!("{} is a shell builtin", &args[0]);
+            } else {
+                if let Some(path) = find_command_in_path(&args[0], path_key) {
+                    println!("{} is {}", &args[0], path)
+                } else {
+                    println!("{}: not found", &args[0]);
+                }
+            }
+
+            0
+        }
+        _ => 1,
+    }
+}
+
 fn main() {
     let key = "PATH";
 
@@ -30,29 +57,17 @@ fn main() {
 
         let command = command.trim();
 
-        let all_cmd = vec!["exit", "echo", "type"];
+        let args: Vec<&str> = command.split(" ").skip(1).collect();
 
         if let Some(cmd) = command.split(" ").nth(0) {
-            match cmd {
-                "exit" => break,
-                "echo" => {
-                    let words: Vec<&str> = command.split(" ").skip(1).collect();
-                    println!("{}", words.join(" "))
-                }
-                "type" => {
-                    let args: Vec<&str> = command.split(" ").skip(1).collect();
+            let return_code = handle_command(cmd, args, key);
 
-                    if args.len() == 1 && all_cmd.contains(&args[0]) {
-                        println!("{} is a shell builtin", &args[0]);
-                    } else {
-                        if let Some(path) = find_command_in_path(&args[0], key) {
-                            println!("{} is {}", &args[0], path)
-                        } else {
-                            println!("{}: not found", &args[0]);
-                        }
-                    }
-                }
-                _ => println!("{}: command not found", command),
+            if return_code == 1 {
+                println!("{}: command not found", command);
+            }
+
+            if return_code == -1 {
+                break;
             }
         }
     }
