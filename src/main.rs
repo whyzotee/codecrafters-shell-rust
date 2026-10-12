@@ -1,5 +1,16 @@
 use std::io::{self, Write};
+use std::os::unix::fs::PermissionsExt;
 use std::{env, fs};
+
+#[cfg(unix)]
+fn check_permission_can_execute(f: &str) -> bool {
+    let metadata = fs::metadata(f).unwrap();
+    let mode = metadata.permissions().mode();
+
+    let user_execute = mode & 0o100 != 0;
+
+    user_execute
+}
 
 fn find_command_in_path(cmd: &str, path: &str) -> Option<String> {
     if let Ok(paths) = env::var(path) {
@@ -18,8 +29,9 @@ fn find_command_in_path(cmd: &str, path: &str) -> Option<String> {
                 }
 
                 let f = f.unwrap().path().display().to_string();
+                let can_execute = check_permission_can_execute(&f);
 
-                if f.split("/").last().unwrap() == cmd {
+                if f.split("/").last().unwrap() == cmd && can_execute {
                     return Some(f);
                 }
             }
