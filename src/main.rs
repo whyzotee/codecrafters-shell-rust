@@ -1,8 +1,10 @@
+use std::env;
 #[allow(unused_imports)]
 use std::io::{self, Write};
 
 fn main() {
-    // TODO: Uncomment the code below to pass the first stage
+    let key = "PATH";
+
     loop {
         print!("$ ");
         io::stdout().flush().unwrap();
@@ -27,6 +29,18 @@ fn main() {
                     if args.len() == 1 && all_cmd.contains(&args[0]) {
                         println!("{} is a shell builtin", &args[0]);
                     } else {
+                        match env::var_os(key) {
+                            Some(paths) => {
+                                for path in env::split_paths(&paths) {
+                                    if path.display().to_string().contains(&args[0]) {
+                                        println!("{} is {}", &args[0], path.display());
+                                        continue;
+                                    }
+                                }
+                            }
+                            None => println!("{key} is not defined in the environment."),
+                        }
+
                         println!("{}: not found", &args[0]);
                     }
                 }
