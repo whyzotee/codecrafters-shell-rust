@@ -5,7 +5,7 @@ use std::io::{self, Write};
 fn main() {
     let key = "PATH";
 
-    loop {
+    'outer: loop {
         print!("$ ");
         io::stdout().flush().unwrap();
 
@@ -34,7 +34,7 @@ fn main() {
                                 for path in env::split_paths(&paths) {
                                     if path.display().to_string().contains(&args[0]) {
                                         println!("{} is {}", &args[0], path.display());
-                                        continue;
+                                        continue 'outer;
                                     }
                                 }
                             }
